@@ -127,7 +127,8 @@ Min. coverage ≥ 85 %.
 2. Describe user‑visible changes & link issue.
 3. GitHub Actions must pass (`uv sync`, tests, linters).
 4. UI changes → screenshot.
-5. After merge, nightly packages via **PyInstaller**.
+5. Verify every `.ui` file compiles via `uv run pyside6-uic src/ui/main_window.ui`.
+6. After merge, nightly packages via **PyInstaller**.
 
 ---
 
