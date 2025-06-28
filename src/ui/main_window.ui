@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowTitle">
+   <string>Image Partitioner</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QListWidget" name="listWidget"/>
+    </item>
+   </layout>
+  </widget>
+  <menubar name="menubar">
+   <addaction name="menuFile"/>
+  </menubar>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open Folder...</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <menu name="menuFile">
+   <property name="title">
+    <string>&amp;File</string>
+   </property>
+   <addaction name="actionOpen"/>
+   <addaction name="actionExit"/>
+  </menu>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
