@@ -5,7 +5,7 @@ try:  # pragma: no cover - optional Qt runtime
 except Exception:  # pragma: no cover - skip when Qt unavailable
     pytest.skip("PySide6 not available", allow_module_level=True)
 
-from src.ui.main_window_ui import Ui_MainWindow
+from image_partition.ui.main_window_ui import Ui_MainWindow
 
 
 def test_main_window_ui_setup(qtbot):

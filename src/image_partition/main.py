@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.controller.main_controller import MainController
+from .controller.main_controller import MainController
 
 
 def main() -> None:

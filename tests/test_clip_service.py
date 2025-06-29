@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from src.domain.clip_service import ClipService
+from image_partition.domain.clip_service import ClipService
 
 
 def test_clip_service_embed(tmp_path: Path) -> None:
