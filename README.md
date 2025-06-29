@@ -4,8 +4,8 @@ A small PySide6 application that groups images by visual similarity using CLIP e
 
 ## Development
 
-After editing `src/ui/main_window.ui`, regenerate the Python class:
+After editing a `.ui` file, regenerate the Python module:
 
 ```bash
-uv run pyside6-uic src/ui/main_window.ui -o src/ui/main_window_ui.py
+uv run pyside6-uic path/to/file.ui -o path/to/file_ui.py
 ```
