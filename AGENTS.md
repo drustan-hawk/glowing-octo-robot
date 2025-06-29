@@ -41,9 +41,10 @@ uv sync
 
 ```
 .
-├── src/                  # Python source code
-│   ├── main.py           # PySide6 entry‑point
-│   ├── ...
+├── src/
+│   └── image_partition/
+│       ├── main.py       # PySide6 entry‑point
+│       └── ...
 ├── assets/               # App icon, sample images (read‑only)
 ├── docs/                 # Design notes, UML, AGENTS.md copies
 ├── pyproject.toml        # Project metadata & deps
@@ -115,7 +116,7 @@ uv run -m black --check .
 |-------|------|---------|
 | Domain | deterministic math | `pytest`, `hypothesis` |
 | Controller | correct Qt signal flow | `pytest-qt` |
-| UI smoke | app launches | `xvfb-run uv run python -m src.main --test` |
+| UI smoke | app launches | `xvfb-run uv run python -m image_partition.main --test` |
 
 Min. coverage ≥ 85 %.
 
@@ -127,7 +128,8 @@ Min. coverage ≥ 85 %.
 2. Describe user‑visible changes & link issue.
 3. GitHub Actions must pass (`uv sync`, tests, linters).
 4. UI changes → screenshot.
-5. After merge, nightly packages via **PyInstaller**.
+5. Verify every `.ui` file compiles via `uv run pyside6-uic path/to/file.ui`.
+6. After merge, nightly packages via **PyInstaller**.
 
 ---
 

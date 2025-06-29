@@ -1,0 +1,79 @@
+import pytest
+
+try:  # pragma: no cover - optional Qt runtime
+    from PySide6.QtWidgets import QApplication, QMainWindow
+except Exception:  # pragma: no cover - skip when Qt unavailable
+    pytest.skip("PySide6 not available", allow_module_level=True)
+
+from image_partition.ui.main_window_ui import Ui_MainWindow
+from image_partition.controller.main_controller import MainController
+from PIL import Image
+
+
+def test_main_window_ui_setup(qtbot):
+    _ = QApplication.instance() or QApplication([])
+    window = QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(window)
+    qtbot.addWidget(window)
+    # if setupUi fails, the test will raise
+
+
+def test_load_images_thumbnail(qtbot, tmp_path):
+    folder = tmp_path / "imgs"
+    folder.mkdir()
+    img = Image.new("RGB", (10, 10))
+    path = folder / "sample.png"
+    img.save(path)
+
+    _ = QApplication.instance() or QApplication([])
+    controller = MainController()
+    controller._load_images(folder)
+    qtbot.addWidget(controller.window)
+
+    item = controller.list_widget.item(0)
+    assert item.text() == "sample.png"
+    assert not item.icon().isNull()
+
+
+def test_assign_to_group(qtbot, tmp_path):
+    folder = tmp_path / "imgs"
+    folder.mkdir()
+    img = Image.new("RGB", (10, 10))
+    path = folder / "img.png"
+    img.save(path)
+
+    _ = QApplication.instance() or QApplication([])
+    controller = MainController()
+    controller._load_images(folder)
+    controller.create_group("g1")
+    controller.list_widget.setCurrentRow(0)
+    controller.group_list.setCurrentRow(0)
+    controller._assign_selected()
+
+    assert path in controller.groups["g1"].paths
+    item = controller.list_widget.item(0)
+    assert item.data(controller.GROUPS_ROLE) == ["g1"]
+
+
+def test_tooltip_and_highlight(qtbot, tmp_path):
+    folder = tmp_path / "imgs"
+    folder.mkdir()
+    img = Image.new("RGB", (10, 10))
+    path = folder / "img.png"
+    img.save(path)
+
+    _ = QApplication.instance() or QApplication([])
+    controller = MainController()
+    controller._load_images(folder)
+    controller.create_group("g1")
+    controller.list_widget.setCurrentRow(0)
+    controller.group_list.setCurrentRow(0)
+    controller._assign_selected()
+
+    item = controller.list_widget.item(0)
+    assert item.toolTip() == "g1"
+
+    controller.list_widget.setCurrentRow(0)
+    selected = [it.text() for it in controller.group_list.selectedItems()]
+    assert selected == ["g1"]
