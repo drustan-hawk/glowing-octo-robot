@@ -43,13 +43,16 @@ from PySide6.QtGui import (
     QTransform,
 )
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QApplication,
+    QHBoxLayout,
     QListView,
     QListWidget,
     QListWidgetItem,
     QMainWindow,
     QMenu,
     QMenuBar,
+    QPushButton,
     QSizePolicy,
     QStatusBar,
     QVBoxLayout,
@@ -67,15 +70,35 @@ class Ui_MainWindow(object):
         self.actionExit.setObjectName("actionExit")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QHBoxLayout(self.centralwidget)
+        self.horizontalLayout.setObjectName("horizontalLayout")
         self.listWidget = QListWidget(self.centralwidget)
         self.listWidget.setObjectName("listWidget")
         self.listWidget.setViewMode(QListView.IconMode)
         self.listWidget.setIconSize(QSize(100, 100))
         self.listWidget.setResizeMode(QListView.Adjust)
 
-        self.verticalLayout.addWidget(self.listWidget)
+        self.horizontalLayout.addWidget(self.listWidget)
+
+        self.groupLayout = QVBoxLayout()
+        self.groupLayout.setObjectName("groupLayout")
+        self.groupListWidget = QListWidget(self.centralwidget)
+        self.groupListWidget.setObjectName("groupListWidget")
+        self.groupListWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+
+        self.groupLayout.addWidget(self.groupListWidget)
+
+        self.addGroupButton = QPushButton(self.centralwidget)
+        self.addGroupButton.setObjectName("addGroupButton")
+
+        self.groupLayout.addWidget(self.addGroupButton)
+
+        self.assignButton = QPushButton(self.centralwidget)
+        self.assignButton.setObjectName("assignButton")
+
+        self.groupLayout.addWidget(self.assignButton)
+
+        self.horizontalLayout.addLayout(self.groupLayout)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -106,6 +129,12 @@ class Ui_MainWindow(object):
             QCoreApplication.translate("MainWindow", "&Open Folder...", None)
         )
         self.actionExit.setText(QCoreApplication.translate("MainWindow", "E&xit", None))
+        self.addGroupButton.setText(
+            QCoreApplication.translate("MainWindow", "Add Group", None)
+        )
+        self.assignButton.setText(
+            QCoreApplication.translate("MainWindow", "Assign Selected Images", None)
+        )
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "&File", None))
 
     # retranslateUi

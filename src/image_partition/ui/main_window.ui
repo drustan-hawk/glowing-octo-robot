@@ -5,26 +5,51 @@
   <property name="windowTitle">
    <string>Image Partitioner</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QListWidget" name="listWidget">
-      <property name="viewMode">
-       <enum>QListView::IconMode</enum>
-      </property>
-      <property name="iconSize">
-       <size>
-        <width>100</width>
-        <height>100</height>
-       </size>
-      </property>
-      <property name="resizeMode">
-       <enum>QListView::Adjust</enum>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+    <widget class="QWidget" name="centralwidget">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QListWidget" name="listWidget">
+        <property name="viewMode">
+         <enum>QListView::IconMode</enum>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="resizeMode">
+         <enum>QListView::Adjust</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="groupLayout">
+        <item>
+         <widget class="QListWidget" name="groupListWidget">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addGroupButton">
+          <property name="text">
+           <string>Add Group</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="assignButton">
+          <property name="text">
+           <string>Assign Selected Images</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
     <widget class="QMenuBar" name="menubar">
      <property name="geometry">
       <rect>

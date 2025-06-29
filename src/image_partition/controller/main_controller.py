@@ -7,12 +7,14 @@ from PySide6.QtCore import Qt, Slot, QSize
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
+    QInputDialog,
     QFileDialog,
     QListWidgetItem,
     QMainWindow,
 )
 
 from ..domain.clip_service import ClipService
+from ..domain.grouping import Group
 from ..ui.main_window_ui import Ui_MainWindow
 
 
@@ -29,7 +31,35 @@ class MainController:
         self.ui.actionOpen.triggered.connect(self._open)
         self.ui.actionExit.triggered.connect(self.app.quit)
         self.list_widget = self.ui.listWidget
+        self.group_list = self.ui.groupListWidget
+        self.add_group_button = self.ui.addGroupButton
+        self.assign_button = self.ui.assignButton
+        self.add_group_button.clicked.connect(self._add_group)
+        self.assign_button.clicked.connect(self._assign_selected)
         self.clip = ClipService()
+        self.groups: dict[str, Group] = {}
+
+    def create_group(self, name: str) -> None:
+        if name and name not in self.groups:
+            self.groups[name] = Group(name, [])
+            self.group_list.addItem(name)
+
+    @Slot()
+    def _add_group(self) -> None:
+        name, ok = QInputDialog.getText(self.window, "Add Group", "Group name:")
+        if ok:
+            self.create_group(name)
+
+    @Slot()
+    def _assign_selected(self) -> None:
+        items = self.list_widget.selectedItems()
+        groups = [item.text() for item in self.group_list.selectedItems()]
+        for group_name in groups:
+            group = self.groups.setdefault(group_name, Group(group_name, []))
+            for it in items:
+                path = it.data(Qt.ItemDataRole.UserRole)
+                if path not in group.paths:
+                    group.paths.append(path)
 
     @Slot()
     def _open(self) -> None:
@@ -53,6 +83,7 @@ class MainController:
                 else:
                     icon = QIcon()
                 item = QListWidgetItem(icon, img.name)
+                item.setData(Qt.ItemDataRole.UserRole, img)
                 item.setSizeHint(QSize(110, 120))
                 self.list_widget.addItem(item)
                 _ = self.clip.embed(img)  # preload embedding

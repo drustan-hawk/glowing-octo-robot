@@ -34,3 +34,21 @@ def test_load_images_thumbnail(qtbot, tmp_path):
     item = controller.list_widget.item(0)
     assert item.text() == "sample.png"
     assert not item.icon().isNull()
+
+
+def test_assign_to_group(qtbot, tmp_path):
+    folder = tmp_path / "imgs"
+    folder.mkdir()
+    img = Image.new("RGB", (10, 10))
+    path = folder / "img.png"
+    img.save(path)
+
+    _ = QApplication.instance() or QApplication([])
+    controller = MainController()
+    controller._load_images(folder)
+    controller.create_group("g1")
+    controller.list_widget.setCurrentRow(0)
+    controller.group_list.setCurrentRow(0)
+    controller._assign_selected()
+
+    assert path in controller.groups["g1"].paths
