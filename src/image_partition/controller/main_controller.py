@@ -149,6 +149,10 @@ class MainController:
         centroids = {
             name: compute_centroid(g, self.clip) for name, g in self.groups.items()
         }
+        names = [n for n, c in centroids.items() if c.any()]
+        if not names:
+            return
+        matrix = np.vstack([centroids[n] for n in names])
         self.result_tree.clear()
         group_nodes: dict[str, QTreeWidgetItem] = {}
         for name in self.groups:
@@ -161,19 +165,14 @@ class MainController:
                 continue
             path = item.data(Qt.ItemDataRole.UserRole)
             emb = self.clip.embed(path)
-            best_name = None
-            best_score = float("-inf")
-            for name, centroid in centroids.items():
-                if not centroid.any():
-                    continue
-                score = float(
-                    np.dot(emb, centroid)
-                    / (np.linalg.norm(emb) * np.linalg.norm(centroid))
-                )
-                if score >= self.groups[name].threshold and score > best_score:
-                    best_score = score
-                    best_name = name
-            if best_name is None:
+            norm = np.linalg.norm(emb)
+            if norm == 0:
+                continue
+            scores = matrix @ emb / norm
+            idx = int(np.argmax(scores))
+            best_score = float(scores[idx])
+            best_name = names[idx]
+            if best_score < self.groups[best_name].threshold:
                 continue
             item.setToolTip(best_name)
             QTreeWidgetItem(group_nodes[best_name], [path.name])
