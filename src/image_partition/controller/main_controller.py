@@ -36,8 +36,10 @@ class MainController:
         self.assign_button = self.ui.assignButton
         self.add_group_button.clicked.connect(self._add_group)
         self.assign_button.clicked.connect(self._assign_selected)
+        self.list_widget.itemSelectionChanged.connect(self._highlight_membership)
         self.clip = ClipService()
         self.groups: dict[str, Group] = {}
+        self.GROUPS_ROLE = Qt.ItemDataRole.UserRole + 1
 
     def create_group(self, name: str) -> None:
         if name and name not in self.groups:
@@ -51,6 +53,22 @@ class MainController:
             self.create_group(name)
 
     @Slot()
+    def _highlight_membership(self) -> None:
+        selected = self.list_widget.selectedItems()
+        if not selected:
+            self.group_list.clearSelection()
+            self.window.statusBar().clearMessage()
+            return
+        memberships: set[str] = set()
+        for it in selected:
+            memberships.update(it.data(self.GROUPS_ROLE) or [])
+        for i in range(self.group_list.count()):
+            grp_item = self.group_list.item(i)
+            grp_item.setSelected(grp_item.text() in memberships)
+        if memberships:
+            self.window.statusBar().showMessage(", ".join(sorted(memberships)))
+
+    @Slot()
     def _assign_selected(self) -> None:
         items = self.list_widget.selectedItems()
         groups = [item.text() for item in self.group_list.selectedItems()]
@@ -60,6 +78,11 @@ class MainController:
                 path = it.data(Qt.ItemDataRole.UserRole)
                 if path not in group.paths:
                     group.paths.append(path)
+                memberships = set(it.data(self.GROUPS_ROLE) or [])
+                memberships.add(group_name)
+                it.setData(self.GROUPS_ROLE, list(memberships))
+                it.setToolTip(", ".join(sorted(memberships)))
+        self._highlight_membership()
 
     @Slot()
     def _open(self) -> None:
@@ -84,6 +107,7 @@ class MainController:
                     icon = QIcon()
                 item = QListWidgetItem(icon, img.name)
                 item.setData(Qt.ItemDataRole.UserRole, img)
+                item.setData(self.GROUPS_ROLE, [])
                 item.setSizeHint(QSize(110, 120))
                 self.list_widget.addItem(item)
                 _ = self.clip.embed(img)  # preload embedding
