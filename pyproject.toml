@@ -13,6 +13,9 @@ dependencies = [
     "torchvision>=0.22.1",
 ]
 
+[project.gui-scripts]
+image-partitioner = "image_partition.main:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
