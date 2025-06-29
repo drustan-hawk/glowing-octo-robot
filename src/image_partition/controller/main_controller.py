@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Slot, QSize
-from PySide6.QtGui import QIcon, QPixmap, QColor
+from PySide6.QtGui import QIcon, QPixmap, QColor, QPainter, QPen
 from PySide6.QtWidgets import (
     QApplication,
     QInputDialog,
@@ -49,6 +49,7 @@ class MainController:
         self.group_colors: dict[str, QColor] = {}
         self._color_index = 0
         self.GROUPS_ROLE = Qt.ItemDataRole.UserRole + 1
+        self.ICON_ROLE = Qt.ItemDataRole.UserRole + 2
 
     def create_group(self, name: str, threshold: float | None = None) -> None:
         if name and name not in self.groups:
@@ -59,7 +60,8 @@ class MainController:
             color = QColor.fromHsv((self._color_index * 60) % 360, 160, 255)
             self.group_colors[name] = color
             self._color_index += 1
-            item.setBackground(color)
+            icon = QIcon(self._color_pixmap(color))
+            item.setIcon(icon)
             self.group_list.addItem(item)
 
     @Slot()
@@ -84,14 +86,34 @@ class MainController:
         if memberships:
             self.window.statusBar().showMessage(", ".join(sorted(memberships)))
 
+    def _color_pixmap(self, color: QColor, size: int = 12) -> QPixmap:
+        pix = QPixmap(size, size)
+        pix.fill(color)
+        return pix
+
+    def _border_icon(self, base: QIcon, color: QColor) -> QIcon:
+        pixmap = base.pixmap(100, 100)
+        result = QPixmap(pixmap.size())
+        result.fill(Qt.GlobalColor.transparent)
+        painter = QPainter(result)
+        painter.drawPixmap(0, 0, pixmap)
+        pen = QPen(color, 3)
+        painter.setPen(pen)
+        painter.drawRect(result.rect().adjusted(1, 1, -1, -1))
+        painter.end()
+        return QIcon(result)
+
     def _update_item_visual(self, item: QListWidgetItem) -> None:
+        base_icon = item.data(self.ICON_ROLE)
+        if not isinstance(base_icon, QIcon):
+            return
         groups = item.data(self.GROUPS_ROLE) or []
         if not groups:
-            item.setBackground(QColor())
+            item.setIcon(base_icon)
             return
         color = self.group_colors.get(groups[0])
         if color:
-            item.setBackground(color)
+            item.setIcon(self._border_icon(base_icon, color))
 
     @Slot()
     def _assign_selected(self) -> None:
@@ -105,6 +127,8 @@ class MainController:
                 path = it.data(Qt.ItemDataRole.UserRole)
                 if path not in group.paths:
                     group.paths.append(path)
+                if it.data(self.ICON_ROLE) is None:
+                    it.setData(self.ICON_ROLE, it.icon())
                 memberships = set(it.data(self.GROUPS_ROLE) or [])
                 memberships.add(group_name)
                 it.setData(self.GROUPS_ROLE, list(memberships))
@@ -151,12 +175,8 @@ class MainController:
                     best_name = name
             if best_name is None:
                 continue
-            memberships = [best_name]
-            item.setData(self.GROUPS_ROLE, memberships)
             item.setToolTip(best_name)
-            self.groups[best_name].paths.append(path)
             QTreeWidgetItem(group_nodes[best_name], [path.name])
-            self._update_item_visual(item)
         self.result_tree.expandAll()
 
     def _load_images(self, folder: Path) -> None:
@@ -175,6 +195,7 @@ class MainController:
                 else:
                     icon = QIcon()
                 item = QListWidgetItem(icon, img.name)
+                item.setData(self.ICON_ROLE, icon)
                 item.setData(Qt.ItemDataRole.UserRole, img)
                 item.setData(self.GROUPS_ROLE, [])
                 item.setSizeHint(QSize(110, 120))

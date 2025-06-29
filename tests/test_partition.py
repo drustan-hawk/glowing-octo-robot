@@ -51,6 +51,8 @@ def test_partition_images_assigns_best_group(qtbot, tmp_path, monkeypatch):
 
     item = controller.list_widget.item(2)
     assert item.toolTip() == "A"
+    assert item.data(controller.GROUPS_ROLE) == []
+    assert u not in controller.groups["A"].paths
     group_items = controller.result_tree.findItems("A", Qt.MatchFlag.MatchExactly)
     assert group_items and group_items[0].childCount() == 1
 
@@ -87,3 +89,5 @@ def test_partition_respects_threshold(qtbot, tmp_path, monkeypatch):
 
     item = controller.list_widget.item(1)
     assert item.toolTip() == ""
+    assert item.data(controller.GROUPS_ROLE) == []
+    assert u not in controller.groups["A"].paths

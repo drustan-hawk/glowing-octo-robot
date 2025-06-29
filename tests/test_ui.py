@@ -53,7 +53,7 @@ def test_assign_to_group(qtbot, tmp_path):
 
     assert path in controller.groups["g1"].paths
     item = controller.list_widget.item(0)
-    assert item.background().color().isValid()
+    assert item.data(controller.GROUPS_ROLE) == ["g1"]
 
 
 def test_tooltip_and_highlight(qtbot, tmp_path):
