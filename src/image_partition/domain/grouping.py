@@ -7,11 +7,14 @@ import numpy as np
 
 from .clip_service import ClipService
 
+DEFAULT_THRESHOLD = 0.3
+
 
 @dataclass
 class Group:
     name: str
     paths: list[Path]
+    threshold: float = DEFAULT_THRESHOLD
 
 
 def compute_centroid(group: Group, service: ClipService) -> np.ndarray:

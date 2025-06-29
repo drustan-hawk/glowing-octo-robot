@@ -44,8 +44,10 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
+    QDoubleSpinBox,
     QHBoxLayout,
     QHeaderView,
+    QLabel,
     QListView,
     QListWidget,
     QListWidgetItem,
@@ -94,6 +96,24 @@ class Ui_MainWindow(object):
         self.addGroupButton.setObjectName("addGroupButton")
 
         self.groupLayout.addWidget(self.addGroupButton)
+
+        self.thresholdLayout = QHBoxLayout()
+        self.thresholdLayout.setObjectName("thresholdLayout")
+        self.thresholdLabel = QLabel(self.centralwidget)
+        self.thresholdLabel.setObjectName("thresholdLabel")
+
+        self.thresholdLayout.addWidget(self.thresholdLabel)
+
+        self.thresholdSpinBox = QDoubleSpinBox(self.centralwidget)
+        self.thresholdSpinBox.setObjectName("thresholdSpinBox")
+        self.thresholdSpinBox.setDecimals(2)
+        self.thresholdSpinBox.setMaximum(1.000000000000000)
+        self.thresholdSpinBox.setSingleStep(0.050000000000000)
+        self.thresholdSpinBox.setValue(0.300000000000000)
+
+        self.thresholdLayout.addWidget(self.thresholdSpinBox)
+
+        self.groupLayout.addLayout(self.thresholdLayout)
 
         self.assignButton = QPushButton(self.centralwidget)
         self.assignButton.setObjectName("assignButton")
@@ -144,6 +164,9 @@ class Ui_MainWindow(object):
         self.actionExit.setText(QCoreApplication.translate("MainWindow", "E&xit", None))
         self.addGroupButton.setText(
             QCoreApplication.translate("MainWindow", "Add Group", None)
+        )
+        self.thresholdLabel.setText(
+            QCoreApplication.translate("MainWindow", "Threshold", None)
         )
         self.assignButton.setText(
             QCoreApplication.translate("MainWindow", "Assign Selected Images", None)

@@ -53,3 +53,37 @@ def test_partition_images_assigns_best_group(qtbot, tmp_path, monkeypatch):
     assert item.toolTip() == "A"
     group_items = controller.result_tree.findItems("A", Qt.MatchFlag.MatchExactly)
     assert group_items and group_items[0].childCount() == 1
+
+
+def test_partition_respects_threshold(qtbot, tmp_path, monkeypatch):
+    folder = tmp_path / "imgs2"
+    folder.mkdir()
+    g1 = folder / "g1.png"
+    u = folder / "u.png"
+    for p in (g1, u):
+        p.write_bytes(b"\x00")
+
+    def fake_embed(self, path: Path) -> np.ndarray:
+        if path == g1:
+            return np.ones(512, dtype=np.float32)
+        if path == u:
+            vec = np.concatenate([np.ones(256), np.zeros(256)])
+            return vec.astype(np.float32)
+        return np.zeros(512, dtype=np.float32)
+
+    monkeypatch.setattr(ClipService, "embed", fake_embed, raising=False)
+
+    _ = QApplication.instance() or QApplication([])
+    controller = MainController()
+    controller._load_images(folder)
+    controller.create_group("A", threshold=0.8)
+
+    controller.list_widget.setCurrentRow(0)
+    controller.group_list.setCurrentRow(0)
+    controller._assign_selected()  # g1 -> A
+
+    controller.list_widget.clearSelection()
+    controller._partition_images()
+
+    item = controller.list_widget.item(1)
+    assert item.toolTip() == ""

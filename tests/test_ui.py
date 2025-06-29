@@ -52,6 +52,8 @@ def test_assign_to_group(qtbot, tmp_path):
     controller._assign_selected()
 
     assert path in controller.groups["g1"].paths
+    item = controller.list_widget.item(0)
+    assert item.background().color().isValid()
 
 
 def test_tooltip_and_highlight(qtbot, tmp_path):
