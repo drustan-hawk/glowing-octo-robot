@@ -3,7 +3,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Qt, Slot, QSize
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -40,7 +41,19 @@ class MainController:
         self.list_widget.clear()
         for img in folder.iterdir():
             if img.suffix.lower() in {".png", ".jpg", ".jpeg"}:
-                item = QListWidgetItem(img.name)
+                pixmap = QPixmap(str(img))
+                if not pixmap.isNull():
+                    thumb = pixmap.scaled(
+                        100,
+                        100,
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation,
+                    )
+                    icon = QIcon(thumb)
+                else:
+                    icon = QIcon()
+                item = QListWidgetItem(icon, img.name)
+                item.setSizeHint(QSize(110, 120))
                 self.list_widget.addItem(item)
                 _ = self.clip.embed(img)  # preload embedding
 

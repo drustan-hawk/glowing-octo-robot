@@ -44,6 +44,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QApplication,
+    QListView,
     QListWidget,
     QListWidgetItem,
     QMainWindow,
@@ -70,6 +71,9 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.listWidget = QListWidget(self.centralwidget)
         self.listWidget.setObjectName("listWidget")
+        self.listWidget.setViewMode(QListView.IconMode)
+        self.listWidget.setIconSize(QSize(100, 100))
+        self.listWidget.setResizeMode(QListView.Adjust)
 
         self.verticalLayout.addWidget(self.listWidget)
 
