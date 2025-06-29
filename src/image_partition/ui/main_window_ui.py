@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# ruff: noqa
 
 ################################################################################
 ## Form generated from reading UI file 'main_window.ui'
@@ -46,6 +45,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QHBoxLayout,
+    QHeaderView,
     QListView,
     QListWidget,
     QListWidgetItem,
@@ -55,6 +55,8 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
     QStatusBar,
+    QTreeWidget,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -98,6 +100,17 @@ class Ui_MainWindow(object):
 
         self.groupLayout.addWidget(self.assignButton)
 
+        self.partitionButton = QPushButton(self.centralwidget)
+        self.partitionButton.setObjectName("partitionButton")
+
+        self.groupLayout.addWidget(self.partitionButton)
+
+        self.resultTreeWidget = QTreeWidget(self.centralwidget)
+        self.resultTreeWidget.setObjectName("resultTreeWidget")
+        self.resultTreeWidget.setHeaderHidden(True)
+
+        self.groupLayout.addWidget(self.resultTreeWidget)
+
         self.horizontalLayout.addLayout(self.groupLayout)
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -134,6 +147,9 @@ class Ui_MainWindow(object):
         )
         self.assignButton.setText(
             QCoreApplication.translate("MainWindow", "Assign Selected Images", None)
+        )
+        self.partitionButton.setText(
+            QCoreApplication.translate("MainWindow", "Auto Partition", None)
         )
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", "&File", None))
 

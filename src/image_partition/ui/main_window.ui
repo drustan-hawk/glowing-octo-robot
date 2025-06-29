@@ -46,6 +46,20 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QPushButton" name="partitionButton">
+          <property name="text">
+           <string>Auto Partition</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTreeWidget" name="resultTreeWidget">
+          <property name="headerHidden">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>

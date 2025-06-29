@@ -11,10 +11,12 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QListWidgetItem,
     QMainWindow,
+    QTreeWidgetItem,
 )
 
 from ..domain.clip_service import ClipService
-from ..domain.grouping import Group
+from ..domain.grouping import Group, compute_centroid
+import numpy as np
 from ..ui.main_window_ui import Ui_MainWindow
 
 
@@ -34,8 +36,11 @@ class MainController:
         self.group_list = self.ui.groupListWidget
         self.add_group_button = self.ui.addGroupButton
         self.assign_button = self.ui.assignButton
+        self.partition_button = self.ui.partitionButton
+        self.result_tree = self.ui.resultTreeWidget
         self.add_group_button.clicked.connect(self._add_group)
         self.assign_button.clicked.connect(self._assign_selected)
+        self.partition_button.clicked.connect(self._partition_images)
         self.list_widget.itemSelectionChanged.connect(self._highlight_membership)
         self.clip = ClipService()
         self.groups: dict[str, Group] = {}
@@ -89,6 +94,46 @@ class MainController:
         folder = QFileDialog.getExistingDirectory(self.window, "Select images")
         if folder:
             self._load_images(Path(folder))
+
+    @Slot()
+    def _partition_images(self) -> None:
+        if not self.groups:
+            return
+        centroids = {
+            name: compute_centroid(g, self.clip) for name, g in self.groups.items()
+        }
+        self.result_tree.clear()
+        group_nodes: dict[str, QTreeWidgetItem] = {}
+        for name in self.groups:
+            node = QTreeWidgetItem([name])
+            self.result_tree.addTopLevelItem(node)
+            group_nodes[name] = node
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item.data(self.GROUPS_ROLE):
+                continue
+            path = item.data(Qt.ItemDataRole.UserRole)
+            emb = self.clip.embed(path)
+            best_name = None
+            best_score = float("-inf")
+            for name, centroid in centroids.items():
+                if not centroid.any():
+                    continue
+                score = float(
+                    np.dot(emb, centroid)
+                    / (np.linalg.norm(emb) * np.linalg.norm(centroid))
+                )
+                if score > best_score:
+                    best_score = score
+                    best_name = name
+            if best_name is None:
+                continue
+            memberships = [best_name]
+            item.setData(self.GROUPS_ROLE, memberships)
+            item.setToolTip(best_name)
+            self.groups[best_name].paths.append(path)
+            QTreeWidgetItem(group_nodes[best_name], [path.name])
+        self.result_tree.expandAll()
 
     def _load_images(self, folder: Path) -> None:
         self.list_widget.clear()
